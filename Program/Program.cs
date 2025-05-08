@@ -14,7 +14,7 @@ abstract class Program
 
     static void Main()
     {
-        int[] threadCounts = [Environment.ProcessorCount];
+        int[] threadCounts = [4];
         
         foreach (int threadCount in threadCounts)
         {
