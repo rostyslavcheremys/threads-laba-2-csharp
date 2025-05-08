@@ -14,20 +14,23 @@ abstract class Program
 
     static void Main()
     {
-        int[] threadCounts = [4];
+        int threadCount = 4;
         
-        foreach (int threadCount in threadCounts)
-        {
-            Console.WriteLine($"\nRunning with {threadCount} threads:\n");
-            FindMinElement(threadCount);
+        Console.WriteLine($"\nRunning with {threadCount} threads:\n");
+        FindMinElement(threadCount);
             
-            lock (CompletionLock)
+        lock (CompletionLock)
+        {
+            while (_completedThreads < threadCount)
             {
-                while (_completedThreads < threadCount)
-                {
-                    Monitor.Wait(CompletionLock);
-                }
+                Monitor.Wait(CompletionLock);
             }
+        }
+            
+        if (_completedThreads == threadCount)
+        {
+            Console.WriteLine($"Minimum element: {_minElement}");
+            Console.WriteLine($"Index of minimum element: {_minIndex}");
         }
     }
 
@@ -89,12 +92,6 @@ abstract class Program
         {
             _completedThreads++;
             Monitor.Pulse(CompletionLock); 
-            
-            if (_completedThreads == threadCount)
-            {
-                Console.WriteLine($"Minimum element: {_minElement}");
-                Console.WriteLine($"Index of minimum element: {_minIndex}");
-            }
         }
     }
 }
